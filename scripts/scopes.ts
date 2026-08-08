@@ -156,10 +156,6 @@ const CERTAIN_EXEMPT_SURFACE: RuleMatch = {
 export const CERTAIN_PACKAGED_LEAF_PREFIXES = [
   "shells/electron/src/",
   "shells/electron/tests/",
-  "apps/desktop/src/",
-  "apps/desktop/tests/",
-  "apps/packaged/src/",
-  "apps/packaged/tests/",
   "tools/pack/src/",
   "tools/pack/tests/",
   "tools/pack/resources/",
@@ -341,8 +337,6 @@ export const scopeRules: readonly ScopeRule[] = [
       prefixes: [
         "tools/pack/",
         "shells/electron/",
-        "apps/packaged/",
-        "apps/desktop/",
         "packages/release/",
         "packages/components/",
         "packages/host/",
@@ -447,7 +441,7 @@ export const scopeRules: readonly ScopeRule[] = [
   },
   {
     // Fail-closed critical gate: Playwright starts `tools-dev web` (daemon +
-    // web runtimes) and never launches the desktop, packaged, or tools-pack
+    // web runtimes) and never launches the Electron Shell or tools-pack
     // entrypoints, so a change confined to those leaf roots cannot alter what
     // the critical suite exercises. Every other non-exempt file — tools-dev,
     // any transitive package (including undeclared edges like metatool),
@@ -459,8 +453,6 @@ export const scopeRules: readonly ScopeRule[] = [
           ...CERTAIN_EXEMPT_PREFIXES,
           ...MEDIUM_EXEMPT_PREFIXES,
           ...CERTAIN_DAEMON_CORE_PREFIXES,
-          "apps/desktop/",
-          "apps/packaged/",
           "shells/electron/",
           "tools/pack/",
         ],
