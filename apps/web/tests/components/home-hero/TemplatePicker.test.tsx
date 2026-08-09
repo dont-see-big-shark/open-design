@@ -25,10 +25,9 @@ function labelFor(chipId: string): string {
   return chipById(chipId).label;
 }
 
-function renderPicker(activeChipId: string | null, onClear = vi.fn()) {
+function renderPicker(activeChipId: string | null) {
   const onPick = vi.fn();
   return {
-    onClear,
     onPick,
     ...render(
       <TemplatePicker
@@ -36,28 +35,24 @@ function renderPicker(activeChipId: string | null, onClear = vi.fn()) {
         activeChipId={activeChipId}
         labelFor={labelFor}
         onPick={onPick}
-        onClear={onClear}
       />,
     ),
   };
 }
 
 describe('TemplatePicker', () => {
-  it('highlights a selected template and exposes an inline reset control', () => {
-    const onClear = vi.fn();
-    const view = renderPicker('wireframe', onClear);
+  it('shows the selected template on the trigger and offers no clear affordance', () => {
+    const view = renderPicker('wireframe');
 
     expect(screen.getByTestId('home-hero-template-picker').className).toContain('has-selection');
     expect(screen.getByTestId('home-hero-template-trigger').textContent).toContain('Wireframe');
-    const reset = screen.getByTestId('home-hero-template-reset');
-    const resetIcon = reset.querySelector('svg');
-    expect(resetIcon).not.toBeNull();
-    expect(resetIcon?.getAttribute('width')).toBe('16');
-    expect(resetIcon?.getAttribute('height')).toBe('16');
+    // Clearing the creation type was removed (per product): neither the pill's
+    // inline × nor the menu's leading Clear row exists any more.
+    expect(screen.queryByTestId('home-hero-template-reset')).toBeNull();
 
-    fireEvent.click(reset);
-    expect(onClear).toHaveBeenCalledTimes(1);
-    expect(screen.queryByTestId('home-hero-template-menu')).toBeNull();
+    fireEvent.click(screen.getByTestId('home-hero-template-trigger'));
+    expect(screen.getByTestId('home-hero-template-menu')).not.toBeNull();
+    expect(screen.queryByTestId('home-hero-template-radial-clear')).toBeNull();
 
     view.rerender(
       <TemplatePicker
@@ -65,12 +60,10 @@ describe('TemplatePicker', () => {
         activeChipId={null}
         labelFor={labelFor}
         onPick={vi.fn()}
-        onClear={onClear}
       />,
     );
 
     expect(screen.getByTestId('home-hero-template-picker').className).not.toContain('has-selection');
-    expect(screen.queryByTestId('home-hero-template-reset')).toBeNull();
     // #5517 dropped the explicit "None" placeholder at rest — the gray
     // "Creation type" kicker alone reads as the empty state, and the label slot
     // only appears once a template is selected.
