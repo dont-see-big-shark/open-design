@@ -220,7 +220,13 @@ async function writeInstalledLaunchPackagedConfig(config: ToolPackConfig, execut
   await mkdir(dirname(launchConfigPath), { recursive: true });
   await writeFile(
     launchConfigPath,
-    `${JSON.stringify({ ...raw, namespaceBaseRoot: config.roots.runtime.namespaceBaseRoot }, null, 2)}\n`,
+    `${JSON.stringify({
+      ...raw,
+      namespaceBaseRoot: config.roots.runtime.namespaceBaseRoot,
+      releaseVersion: config.releaseVersion
+        ?? (typeof raw.releaseVersion === "string" ? raw.releaseVersion : undefined)
+        ?? (typeof raw.shellVersion === "string" ? raw.shellVersion : undefined),
+    }, null, 2)}\n`,
     "utf8",
   );
   return launchConfigPath;
